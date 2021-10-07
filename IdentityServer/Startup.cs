@@ -1,17 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using IdentityServer.Data;
+using IdentityServer.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 
 namespace IdentityServer
 {
@@ -29,6 +26,11 @@ namespace IdentityServer
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddControllers();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo {Title = "IdentityServer", Version = "v1"});
+            });
             var connectionString = Configuration.GetConnectionString("IdentityDatabase");
             var migrationAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
 
@@ -61,6 +63,11 @@ namespace IdentityServer
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "IdentityServer v1");
+                });
             }
             else
             {
@@ -68,9 +75,10 @@ namespace IdentityServer
                 app.UseHsts();
             }
             
-            context.Database.Migrate();
-            
-            DatabaseInitializer.PopulateIdentityServer(app);
+            // Uncomment this for the first time
+            // context.Database.Migrate();
+            //
+            // DatabaseInitializer.PopulateIdentityServer(app);
 
             app.UseHttpsRedirection();
 

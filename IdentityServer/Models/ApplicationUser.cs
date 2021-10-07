@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace IdentityServer.Data
+namespace IdentityServer.Models
 {
     public class ApplicationUser: IdentityUser
     {
-        
+        public bool IsStaff { get; set; }
     }
 }
